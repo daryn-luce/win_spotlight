@@ -36,7 +36,6 @@ def removeDuplicates(dir):
 					if(files not in del_files):
 						del_files.append(files)
 	for file in del_files:
-		print(file[:12])
 		if(file[:12] != name_scheme):
 			os.remove(dir + file)
 	
