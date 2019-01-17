@@ -3,56 +3,49 @@ import filecmp
 import pygame
 from shutil import copyfile
 
-pic_dir = "C:\\Users\\" + os.getlogin() + "\\Pictures\\wp"
-spotlight_dir = "C:\\Users\\" + os.getlogin() + "\\AppData\\Local\\Packages\\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\\LocalState\\Assets"
+pic_dir = "C:\\Users\\" + os.getlogin() + "\\Pictures\\wpp\\"
+spotlight_dir = "C:\\Users\\" + os.getlogin() + "\\AppData\\Local\\Packages\\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\\LocalState\\Assets\\"
 
+def getFiles(spot_dir, save_dir):
+	for files in os.listdir(spot_dir):
+		if (os.path.getsize(spot_dir + files) > 100000):
+			copyfile(spot_dir + files,save_dir + files + ".png")
+			tempimg = pygame.image.load(save_dir + files + ".png")
+			if(tempimg.get_width() != 1920):
+				os.remove(save_dir + files + ".png")
+
+def removeDuplicates(dir):
+	del_files = []
+	for files in os.listdir(dir):
+		for comp_files in os.listdir(dir):
+			if(files != comp_files):
+				if(filecmp.cmp(dir + files, dir + comp_files)):
+					#print("Removing file" + files + " becuase it's a duplicate")
+					del_files.append(files)
+	for file in del_files:
+		if(file[:9] != "Spotlight"):
+			os.remove(dir + file)
+			
+		
+def renameWallPaper(dir):
+	i = 0
+	for files in os.listdir(dir):
+		i += 1
+		os.rename(dir + files, dir + "Spotlight_wp" + str(i))
+	for files in os.listdir(dir):
+		os.rename(dir + files, dir + files + ".png")
 
 #print(filecmp.cmp(pic_dir + "\\a.jpg", pic_dir + "\\c.jpg"))
 #print(pygame.image.load(pic_dir + "\\a.jpg").get_width())
 # copyfile(pic_dir + "\\a", pic_dir + "\\new\\a.jpg")
 	
-# if(os.path.isdir(pic_dir)):
-	# #copyfile("C:\\Users\\" + os.getlogin() + "\\Pictures\\test.txt", pic_dir + "\\test.txt")
-# else:
-	# os.mkdir(pic_dir)
-def removeDup():
-	i = 1
+if(os.path.isdir(pic_dir)):
+	#curLen = (len(os.listdir(pic_dir)) + 1)
+	getFiles(spotlight_dir, pic_dir)
+	removeDuplicates(pic_dir)
+	renameWallPaper(pic_dir)
 	
-	for files in os.listdir(pic_dir):
-		print(i)
-		print(files)
-		try:
-			if(filecmp.cmp(pic_dir + "\\" + str(i) + ".jpg", pic_dir + "\\" + files)):
-				print("")
-			else:
-				os.remove(pic_dir + "\\" + str(i) + ".jpg")
-		except:
-			print("no files move on")
-		i += 1
-def renamePic():
-	i = 0
-	for files in os.listdir(pic_dir):
-		i += 1
-		os.rename(pic_dir + "\\" + files, pic_dir + "\\" + str(i))
-	i = 0
-	for files in os.listdir(pic_dir):
-		i += 1
-		os.rename(pic_dir + "\\" + files, pic_dir + "\\" + str(i) + ".jpg")
-curLen = (len(os.listdir(pic_dir)) + 1)
-for files in os.listdir(spotlight_dir):
-	if (os.path.getsize(spotlight_dir + "\\" + files) > 150000):
-		renamePic()
-		copyfile(spotlight_dir + "\\" + files,pic_dir + "\\" + files + ".jpg")
-		tempimg = pygame.image.load(pic_dir + "\\" + files + ".jpg")
-		if(tempimg.get_width() == 1920):	
-			os.rename(pic_dir + "\\" + files + ".jpg",pic_dir + "\\" + str(curLen) + ".jpg")
-			# for nxtFile in os.listdir(spotlight_dir):
-				# print("_")
-			curLen += 1
-		else:
-			os.remove(pic_dir + "\\" + files + ".jpg")
-		#print(files + " [Size:][" + str(os.path.getsize(spotlight_dir + "\\" + files)) + "]")
-
-removeDup()
-renamePic()
-			
+else:
+	os.mkdir(pic_dir)
+	getFiles(spotlight_dir, pic_dir)
+	
